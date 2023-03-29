@@ -1,3 +1,5 @@
+<?php require "src/AutoLoader.php"; ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
