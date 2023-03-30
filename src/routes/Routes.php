@@ -1,6 +1,7 @@
 <?php
 
 namespace routes;
+
 class Routes {
 
 	private array $routes = [
@@ -9,28 +10,28 @@ class Routes {
 					"path"              => '/',
 					"controller"        => "IndexController",
 					"controller_method" => "index",
-					"methods"            => ["get"],
+					"methods"           => ["get"],
 			],
 			[
 					"name"              => "search_index",
 					"path"              => "/search",
 					"controller"        => "SearchController",
 					"controller_method" => "index",
-					"methods"            => ["get"],
+					"methods"           => ["get"],
 			],
 			[
 					"name"              => "recording_index",
 					"path"              => "/recording",
 					"controller"        => "RecordingController",
 					"controller_method" => "index",
-					"methods"            => ["get"],
+					"methods"           => ["get"],
 			],
 			[
 					"name"              => "recording_new",
 					"path"              => "/recording/new",
 					"controller"        => "RecordingController",
 					"controller_method" => "new",
-					"methods"            => ["get", "post"],
+					"methods"           => ["get", "post"],
 			],
 	];
 
