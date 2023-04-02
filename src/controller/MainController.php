@@ -4,10 +4,10 @@ namespace controller;
 
 class MainController {
 
-	public function render_template($template, $data = []) {
+	public function render_template($data) {
 		$title = $data["title"];
 		$script = $data["script"];
-		$content = !empty($data) ? $this->hydrate_template($template, $data["data"]) : "";
+		$content = isset($data["template"]) ? $this->hydrate_template($data["template"], $data["data"]) : "";
 
 		require dirname(__DIR__, 2) . "/templates/base_template.php";
 	}
