@@ -4,8 +4,18 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
-	<script type="module" src="assets/js/script.js"></script>
-	<title> <?php echo $title; ?> </title>
+	<?php if (!empty($module_scripts)) : ?>
+		<?php foreach ($module_scripts as $script_name) : ?>
+			<script type="module" src="<?php echo $script_name; ?>.js"></script>
+		<?php endforeach; ?>
+	<?php endif; ?>
+	<title>
+	<?php if (!empty($title)) : ?>
+		<?php echo $title; ?>
+	<?php else : ?>
+		Bird recording manager
+	<?php endif; ?>
+	</title>
 </head>
 <body>
 <div class="main-container">
@@ -14,9 +24,15 @@
 		<input type="button" name="search-bird-name" value="Search">
 	</div>
 	<div class="bird-recordings">
-		<?php echo $content; ?>
+		<?php if (!empty($content)) : ?>
+			<?php echo $content; ?>
+		<?php endif; ?>
 	</div>
 </div>
-<?php echo $script; ?>
+<?php if (!empty($scripts)) : ?>
+	<?php foreach ($scripts as $script_name) : ?>
+		<script src="<?php echo $script_name; ?>.js"></script>
+	<?php endforeach; ?>
+<?php endif; ?>
 </body>
 </html>

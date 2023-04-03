@@ -5,9 +5,10 @@ namespace controller;
 class MainController {
 
 	public function render_template($data) {
-		$title = $data["title"];
-		$script = $data["script"];
+		$module_scripts = $data["module_scripts"] ?? [];
+		$title = $data["title"] ?? "";
 		$content = isset($data["template"]) ? $this->hydrate_template($data["template"], $data["data"]) : "";
+		$scripts = $data["scripts"] ?? [];
 
 		require dirname(__DIR__, 2) . "/templates/base_template.php";
 	}
