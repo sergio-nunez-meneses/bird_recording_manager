@@ -23,7 +23,7 @@
 		<input type="text" name="bird-name" placeholder="Type a bird's generic name">
 		<input type="button" name="search-bird-name" value="Search">
 	</div>
-	<div class="bird-recordings">
+	<div class="bird-container">
 		<?php if (!empty($content)) : ?>
 			<?php echo $content; ?>
 		<?php endif; ?>
