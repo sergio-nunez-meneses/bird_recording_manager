@@ -17,17 +17,17 @@ class MainController {
 		$hydrated_template = "";
 
 		if ($this->is_associative($data)) {
-			$hydrated_template = $this->str_replace_all($raw_template, $data);
+			$hydrated_template = $this->template_replace_all($raw_template, $data);
 		}
 		else {
 			foreach ($data as $row) {
-				$hydrated_template .= $this->str_replace_all($raw_template, $row);
+				$hydrated_template .= $this->template_replace_all($raw_template, $row);
 			}
 		}
 		return $hydrated_template;
 	}
 
-	public function str_replace_all($template, $data) {
+	public function template_replace_all($template, $data) {
 		foreach ($data as $key => $value) {
 			$value = filter_var($value, FILTER_VALIDATE_INT) ? strval($value) : $value;
 			$template = str_replace("{{ $key }}", $value, $template);
