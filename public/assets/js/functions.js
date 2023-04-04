@@ -19,3 +19,28 @@ export function fetchResource(type, name = "") {
 				return result;
 			})
 }
+
+export function hydrateTemplate(template, data) {
+	let hydratedTemplate = "";
+
+	if (isObject(data)) {
+		hydratedTemplate = templateReplaceAll(template, data);
+	}
+	else {
+		for (const obj of data) {
+			hydratedTemplate += templateReplaceAll(template, obj);
+		}
+	}
+	return hydratedTemplate;
+}
+
+function templateReplaceAll(template, data) {
+	for (const [key, value] of Object.entries(data)) {
+		template = template.replaceAll(`{{ ${key} }}`, value);
+	}
+	return template;
+}
+
+function isObject(data) {
+	return data && typeof data === 'object' && data.constructor === Object;
+}
