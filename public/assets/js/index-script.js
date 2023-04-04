@@ -1,7 +1,7 @@
 // ============================================================================
 //  Imports
 // ============================================================================
-import {fetchResource, hydrateTemplate} from './functions.js';
+import {ajax, hydrateTemplate} from './functions.js';
 
 // ============================================================================
 //  Variables
@@ -11,7 +11,7 @@ import {fetchResource, hydrateTemplate} from './functions.js';
 //  Functions
 // ============================================================================
 async function getBirdRecordings(birdName) {
-	const data = await fetchResource("api", birdName);
+	const data = await ajax("get", `https://xeno-canto.org/api/2/recordings?query=${birdName}+cnt:france`);
 	const bird = {};
 
 	if (parseInt(data["numRecordings"]) > 0) {
@@ -54,8 +54,8 @@ document.querySelector('[name="search-button"]').addEventListener("click", async
 	const birdRecordings = await getBirdRecordings(birdName);
 
 	if (Object.keys(birdRecordings).length > 0) {
-		const birdTemplate = await fetchResource("template", "bird");
-		const recordingTemplate = await fetchResource("template", "recording");
+		const birdTemplate = await ajax("get", "../templates/bird.html")
+		const recordingTemplate = await ajax("get", "../templates/recording.html")
 		const hydratedBirdTemplate = hydrateTemplate(birdTemplate, {"birdGenName": toTitleCase(birdName)});
 		const hydratedRecordingTemplate = hydrateTemplate(recordingTemplate, birdRecordings["recordings"]);
 

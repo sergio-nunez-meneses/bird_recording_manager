@@ -1,23 +1,27 @@
 /**
  *
- * @param {string} type
- * @param {string} name
+ * @param {string} method
+ * @param {string} url
+ * @param {FormData} data
  * @returns {Promise<Response>}
  */
-export function fetchResource(type, name = "") {
-	const isApi = type === "api";
-	const url = isApi ? `https://xeno-canto.org/api/2/recordings?query=${name}+cnt:france` : `../templates/${name}.html`;
+export function ajax(method, url, data = null) {
+	const payload = {method: method}
+	const templateUrlParts = ["templates", "html"];
+	const isTemplate = Array.from(new Set(templateUrlParts.map(str => url.includes(str))));
 
-	return fetch(url)
-			.then((response) => {
-				if (isApi) {
-					return response.json();
+	if (data !== null) {
+		payload["body"] = data;
+	}
+
+	return fetch(url, payload)
+			.then(response => {
+				if (isTemplate.length === 1 && isTemplate[0]) {
+					return response.text();
 				}
-				return response.text();
+				return response.json();
 			})
-			.then((result) => {
-				return result;
-			})
+			.then(result => {return result})
 }
 
 export function hydrateTemplate(template, data) {
