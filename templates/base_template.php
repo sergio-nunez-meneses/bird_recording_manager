@@ -21,13 +21,11 @@
 <div class="main-container">
 	<div class="search-container">
 		<input type="text" name="bird-name" placeholder="Type a bird's generic name">
-		<input type="button" name="search-bird-name" value="Search">
+		<input type="button" name="search-button" value="Search">
 	</div>
-	<div class="bird-container">
-		<?php if (!empty($content)) : ?>
-			<?php echo $content; ?>
-		<?php endif; ?>
-	</div>
+	<?php if (!empty($content)) : ?>
+		<?php echo $content; ?>
+	<?php endif; ?>
 </div>
 <?php if (!empty($scripts)) : ?>
 	<?php foreach ($scripts as $script_name) : ?>
