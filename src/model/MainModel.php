@@ -20,6 +20,6 @@ class MainModel {
 
 		$stmt = $this->db->prepare($sql);
 		$stmt->execute($placeholders);
-		return $stmt;
+		return $stmt->fetchAll();
 	}
 }
