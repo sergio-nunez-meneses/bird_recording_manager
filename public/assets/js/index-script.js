@@ -14,19 +14,17 @@ async function getBirdRecordings(birdName) {
 	const data = await fetchResource("api", birdName);
 	const bird = {};
 
-	if (data["numRecordings"] > "0") {
-		bird["birdGenName"] = toTitleCase(birdName);
-		bird["recordings"] = {
-			"fileUrl"    : [],
-			"downloadUrl": [],
-		}
+	if (parseInt(data["numRecordings"]) > 0) {
+		bird["recordings"] = [];
 
 		for (const recording of data["recordings"]) {
-			const filePath = recording["sono"]["small"].split("ffts")[0];
-			const fileName = encodeURIComponent(recording["file-name"]);
-			const fileUrl = `https:${filePath}${fileName}`;
-			bird["recordings"]["fileUrl"].push(fileUrl)
-			bird["recordings"]["downloadUrl"].push(recording["file"])
+			const fileUrl = recording["sono"]["small"].split("ffts")[0] + encodeURIComponent(recording["file-name"]);
+			const fileUrls = {
+				"fileUrl"    : `https:${fileUrl}`,
+				"downloadUrl": recording["file"],
+			};
+
+			bird["recordings"].push(fileUrls);
 		}
 	}
 	return bird;
