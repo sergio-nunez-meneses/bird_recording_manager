@@ -1,7 +1,7 @@
 // ============================================================================
 //  Imports
 // ============================================================================
-import {fetchResource} from './functions.js';
+import {fetchResource, hydrateTemplate} from './functions.js';
 
 // ============================================================================
 //  Variables
@@ -36,6 +36,10 @@ function toTitleCase(str) {
 	}).join(" ");
 }
 
+function strToDom(str) {
+	return new DOMParser().parseFromString(str, "text/html").body;
+}
+
 // ============================================================================
 //  Code to execute
 // ============================================================================
@@ -43,7 +47,7 @@ function toTitleCase(str) {
 // ============================================================================
 //  EventListeners
 // ============================================================================
-document.querySelector('[name="search-bird-name"]').addEventListener("click", async(e) => {
+document.querySelector('[name="search-button"]').addEventListener("click", async(e) => {
 	e.preventDefault();
 
 	const birdName = document.querySelector('[name="bird-name"]').value;
@@ -52,5 +56,16 @@ document.querySelector('[name="search-bird-name"]').addEventListener("click", as
 	if (Object.keys(birdRecordings).length > 0) {
 		const birdTemplate = await fetchResource("template", "bird");
 		const recordingTemplate = await fetchResource("template", "recording");
+		const hydratedBirdTemplate = hydrateTemplate(birdTemplate, {"birdGenName": toTitleCase(birdName)});
+		const hydratedRecordingTemplate = hydrateTemplate(recordingTemplate, birdRecordings["recordings"]);
+
+		if (document.querySelector(".bird-container")) {
+			document.querySelector(".bird-container").remove();
+		}
+
+		document.querySelector(".main-container").appendChild(strToDom(hydratedBirdTemplate).firstElementChild);
+		Array.from(strToDom(hydratedRecordingTemplate).children).forEach(
+				recording => document.querySelector(".bird-recordings").appendChild(recording)
+		);
 	}
 })
