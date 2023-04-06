@@ -20,10 +20,6 @@ class MainModel {
 
 		$stmt = $this->db->prepare($sql);
 		$stmt->execute($placeholders);
-
-		if (str_contains(strtolower($sql), "select")) {
-			return $stmt->fetchAll();
-		}
-		return $stmt->rowCount();
+		return $stmt;
 	}
 }
