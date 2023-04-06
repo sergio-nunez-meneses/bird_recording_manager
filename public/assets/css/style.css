@@ -1,0 +1,67 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	text-decoration: none;
+}
+
+.hidden {
+	display: none !important;
+}
+
+body {
+	font-family: Roboto, sans-serif;
+	background: #202124;
+	color: #fff;
+}
+
+.main-container, .bird-container, .bird-info, .bird-recordings, .recording {
+	display: flex;
+}
+
+.bird-container, .bird-info {
+	flex-direction: column;
+}
+
+.main-container, .bird-recordings {
+	flex-wrap: wrap;
+}
+
+.main-container {
+	justify-content: space-between;
+}
+
+.bird-container {
+	box-shadow: 0 3px 2px rgba(0, 0, 0, 0.34), 0 7px 5px rgba(0, 0, 0, 0.48), 0 13px 10px rgba(0, 0, 0, 0.6), 0 22px 18px rgba(0, 0, 0, 0.72), 0 42px 33px rgba(0, 0, 0, 0.86), 0 100px 80px rgba(0, 0, 0, 0.12);
+	border-radius: 5px;
+	padding-top: 0.5rem;
+	background: rgba(51, 51, 51, 0.8);
+}
+
+.bird-info {
+	align-items: center;
+}
+
+.bird-recordings {
+	justify-content: center;
+}
+
+.recording .player-container {
+	position: relative;
+}
+
+.recording .player-container img {
+	position: absolute;
+	right: -0%;
+	width: 18px;
+	border-radius: 2px;
+	padding: 0.2em;
+	background-color: whitesmoke;
+}
+
+.bird-recordings, .recording {
+	padding: 0.5rem;
+}
+.download-link {
+	color: #fff;
+}
