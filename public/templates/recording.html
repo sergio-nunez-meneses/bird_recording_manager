@@ -1,4 +1,7 @@
 <div class="recording">
-  <audio src="{{ fileUrl }}" controls=""></audio>
-  <a href="{{ downloadUrl }}" class="hidden download-link" download>Download file</a>
+  <div class="player-container">
+    <img {{ fileIcon }} />
+    <audio src="{{ fileUrl }}" controls=""></audio>
+  </div>
+  <a href="{{ downloadUrl }}" class="download-link" download>Download file</a>
 </div>
