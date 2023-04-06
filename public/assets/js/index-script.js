@@ -10,18 +10,36 @@ import {ajax, hydrateTemplate} from './functions.js';
 // ============================================================================
 //  Functions
 // ============================================================================
+async function getStoredRecordings(birdName) {
+	const data = new FormData();
+	data.append("action", "get_recordings");
+	data.append("bird_name", birdName);
+
+	return await ajax("post", "/ajax", data);
+}
+
+function setFileIcon(recordings, fileName) {
+	if (recordings.find(recording => recording["file_name"] === fileName) !== undefined) {
+		return 'class="stored-icon" src="/assets/img/icons/star.svg"';
+	}
+	return 'class="hidden"';
+}
+
 async function getBirdRecordings(birdName) {
-	const data = await ajax("get", `https://xeno-canto.org/api/2/recordings?query=${birdName}+cnt:france`);
+	const recordings = await ajax("get", `https://xeno-canto.org/api/2/recordings?query=${birdName}+cnt:france`);
 	const bird = {};
 
-	if (parseInt(data["numRecordings"]) > 0) {
+	if (parseInt(recordings["numRecordings"]) > 0) {
+		const stored = await getStoredRecordings(birdName);
 		bird["recordings"] = [];
 
-		for (const recording of data["recordings"]) {
-			const fileUrl = recording["sono"]["small"].split("ffts")[0] + encodeURIComponent(recording["file-name"]);
-			const fileUrls = {
+		for (const recording of recordings["recordings"]) {
+			const fileName = recording["file-name"];
+			const fileUrl = recording["sono"]["small"].split("ffts")[0] + encodeURIComponent(fileName);
+			let fileUrls = {
 				"fileUrl"    : `https:${fileUrl}`,
 				"downloadUrl": recording["file"],
+				"fileIcon"   : setFileIcon(stored["recordings"], fileName),
 			};
 
 			bird["recordings"].push(fileUrls);
@@ -38,6 +56,10 @@ function toTitleCase(str) {
 
 function strToDom(str) {
 	return new DOMParser().parseFromString(str, "text/html").body;
+}
+
+function objectIsEmpty(obj) {
+	return Object.keys(obj).length === 0;
 }
 
 // ============================================================================
@@ -65,7 +87,7 @@ document.querySelector('[name="search-button"]').addEventListener("click", async
 
 		document.querySelector(".main-container").appendChild(strToDom(hydratedBirdTemplate).firstElementChild);
 		Array.from(strToDom(hydratedRecordingTemplate).children).forEach(
-				recording => document.querySelector(".bird-recordings").appendChild(recording)
+				recording => document.querySelector(".bird-recordings").appendChild(recording),
 		);
 	}
 })
