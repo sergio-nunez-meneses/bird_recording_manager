@@ -6,6 +6,7 @@ import {ajax, hydrateTemplate} from './functions.js';
 // ============================================================================
 //  Variables
 // ============================================================================
+const enteredBirdName = document.querySelector('[name="bird-name"]');
 
 // ============================================================================
 //  Functions
@@ -13,7 +14,7 @@ import {ajax, hydrateTemplate} from './functions.js';
 async function displayBirdRecordings(e) {
 	e.preventDefault();
 
-	const birdName = document.querySelector('[name="bird-name"]').value;
+	const birdName = enteredBirdName.value;
 	const birdRecordings = await getBirdRecordings(birdName);
 
 	if (Object.keys(birdRecordings).length > 0) {
@@ -28,8 +29,29 @@ async function displayBirdRecordings(e) {
 
 		document.querySelector(".main-container").appendChild(strToDom(hydratedBirdTemplate).firstElementChild);
 		Array.from(strToDom(hydratedRecordingTemplate).children).forEach(
-				recording => document.querySelector(".bird-recordings").appendChild(recording),
+				recording => document.querySelector(".bird-recordings").appendChild(recording)
 		);
+
+		// TODO: Refactor
+		for (const link of document.querySelectorAll(".download-link")) {
+			link.addEventListener("click", async (e) => {
+				e.preventDefault();
+
+				const audio = link.previousElementSibling.lastElementChild;
+				const fileName = audio.src.split("/").pop();
+				const data = new FormData();
+				console.log(enteredBirdName.value, fileName);
+
+				data.append("action", "store_recording");
+				data.append("bird_name", enteredBirdName.value);
+				data.append("file_name", fileName);
+
+				console.log(await ajax("post", "/ajax", data));
+			})
+		}
+
+		// Automatic test
+		document.querySelector(".download-link").dispatchEvent(new Event("click"));
 	}
 }
 
@@ -90,4 +112,9 @@ function strToDom(str) {
 // ============================================================================
 document.querySelector('[name="search-button"]').addEventListener("click", async (e) => {
 	await displayBirdRecordings(e);
+});
+
+// Automatic test
+document.addEventListener("DOMContentLoaded", () => {
+	document.querySelector('[name="search-button"]').dispatchEvent(new Event("click"));
 });
