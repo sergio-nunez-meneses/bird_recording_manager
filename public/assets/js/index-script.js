@@ -10,19 +10,27 @@ import {ajax, hydrateTemplate} from './functions.js';
 // ============================================================================
 //  Functions
 // ============================================================================
-async function getStoredRecordings(birdName) {
-	const data = new FormData();
-	data.append("action", "get_recordings");
-	data.append("bird_name", birdName);
+async function displayBirdRecordings(e) {
+	e.preventDefault();
 
-	return await ajax("post", "/ajax", data);
-}
+	const birdName = document.querySelector('[name="bird-name"]').value;
+	const birdRecordings = await getBirdRecordings(birdName);
 
-function setFileIcon(recordings, fileName) {
-	if (recordings.find(recording => recording["file_name"] === fileName) !== undefined) {
-		return 'class="stored-icon" src="/assets/img/icons/star.svg"';
+	if (Object.keys(birdRecordings).length > 0) {
+		const birdTemplate = await ajax("get", "../templates/bird.html")
+		const recordingTemplate = await ajax("get", "../templates/recording.html")
+		const hydratedBirdTemplate = hydrateTemplate(birdTemplate, {"birdGenName": toTitleCase(birdName)});
+		const hydratedRecordingTemplate = hydrateTemplate(recordingTemplate, birdRecordings["recordings"]);
+
+		if (document.querySelector(".bird-container")) {
+			document.querySelector(".bird-container").remove();
+		}
+
+		document.querySelector(".main-container").appendChild(strToDom(hydratedBirdTemplate).firstElementChild);
+		Array.from(strToDom(hydratedRecordingTemplate).children).forEach(
+				recording => document.querySelector(".bird-recordings").appendChild(recording),
+		);
 	}
-	return 'class="hidden"';
 }
 
 async function getBirdRecordings(birdName) {
@@ -48,6 +56,21 @@ async function getBirdRecordings(birdName) {
 	return bird;
 }
 
+async function getStoredRecordings(birdName) {
+	const data = new FormData();
+	data.append("action", "get_recordings");
+	data.append("bird_name", birdName);
+
+	return await ajax("post", "/ajax", data);
+}
+
+function setFileIcon(recordings, fileName) {
+	if (recordings.find(recording => recording["file_name"] === fileName) !== undefined) {
+		return 'class="stored-icon" src="/assets/img/icons/star.svg"';
+	}
+	return 'class="hidden"';
+}
+
 function toTitleCase(str) {
 	return str.split(" ").map(word => {
 		return word[0].toUpperCase() + word.slice(1).toLowerCase();
@@ -58,10 +81,6 @@ function strToDom(str) {
 	return new DOMParser().parseFromString(str, "text/html").body;
 }
 
-function objectIsEmpty(obj) {
-	return Object.keys(obj).length === 0;
-}
-
 // ============================================================================
 //  Code to execute
 // ============================================================================
@@ -69,25 +88,6 @@ function objectIsEmpty(obj) {
 // ============================================================================
 //  EventListeners
 // ============================================================================
-document.querySelector('[name="search-button"]').addEventListener("click", async(e) => {
-	e.preventDefault();
-
-	const birdName = document.querySelector('[name="bird-name"]').value;
-	const birdRecordings = await getBirdRecordings(birdName);
-
-	if (Object.keys(birdRecordings).length > 0) {
-		const birdTemplate = await ajax("get", "../templates/bird.html")
-		const recordingTemplate = await ajax("get", "../templates/recording.html")
-		const hydratedBirdTemplate = hydrateTemplate(birdTemplate, {"birdGenName": toTitleCase(birdName)});
-		const hydratedRecordingTemplate = hydrateTemplate(recordingTemplate, birdRecordings["recordings"]);
-
-		if (document.querySelector(".bird-container")) {
-			document.querySelector(".bird-container").remove();
-		}
-
-		document.querySelector(".main-container").appendChild(strToDom(hydratedBirdTemplate).firstElementChild);
-		Array.from(strToDom(hydratedRecordingTemplate).children).forEach(
-				recording => document.querySelector(".bird-recordings").appendChild(recording),
-		);
-	}
-})
+document.querySelector('[name="search-button"]').addEventListener("click", async (e) => {
+	await displayBirdRecordings(e);
+});
