@@ -21,7 +21,7 @@ class AjaxController extends MainController {
 
 	private function get_recordings($request) {
 		$recording_model = new RecordingModel();
-		$recordings = $recording_model->find_all($request);
+		$recordings = $recording_model->find_all($request)->fetchAll();
 
 		return [
 				"recordings" => $recordings,
@@ -30,11 +30,19 @@ class AjaxController extends MainController {
 
 	private function store_recording($request) {
 		$recording_model = new RecordingModel();
-		// TODO: Check if file_name exists
-		$recordings = $recording_model->insert($request);
+		$record_exists = !empty($recording_model->find_one($request["file_name"])->fetch());
+		$response = false;
+
+		if (!$record_exists) {
+			$recording = $recording_model->insert($request);
+
+			if ($recording->rowCount() === 1) {
+				$response = true;
+			}
+		}
 
 		return [
-				"data" => $recordings,
+				"recording" => $response,
 		];
 	}
 }
