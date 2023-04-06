@@ -27,4 +27,14 @@ class AjaxController extends MainController {
 				"recordings" => $recordings,
 		];
 	}
+
+	private function store_recording($request) {
+		$recording_model = new RecordingModel();
+		// TODO: Check if file_name exists
+		$recordings = $recording_model->insert($request);
+
+		return [
+				"data" => $recordings,
+		];
+	}
 }
