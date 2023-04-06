@@ -25,6 +25,12 @@ class RecordingModel extends MainModel {
 		return $this->run_query("SELECT * FROM recording {$where}", $placeholders);
 	}
 
+	public function find_one($file_name) {
+		$sql = "SELECT * FROM recording WHERE file_name=:file_name";
+
+		return $this->run_query($sql, ["file_name" => $file_name]);
+	}
+
 	public function insert($data) {
 		$sql = "INSERT INTO recording (bird_name, file_name, date_added) VALUES (:bird_name, :file_name, NOW())";
 
