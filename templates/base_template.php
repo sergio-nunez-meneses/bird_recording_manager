@@ -19,8 +19,10 @@
 </head>
 <body>
 <div class="main-container">
+	<!-- TODO: Handle errors -->
+	<div class="error-container hidden"></div>
 	<div class="search-container">
-		<input type="text" name="bird-name" placeholder="Type a bird's generic name">
+		<input type="text" name="bird-name" value="dendrocopos major" placeholder="Type a bird's generic name">
 		<input type="button" name="search-button" value="Search">
 	</div>
 	<?php if (!empty($content)) : ?>
