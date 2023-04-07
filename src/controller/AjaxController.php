@@ -31,18 +31,22 @@ class AjaxController extends MainController {
 	private function store_recording($request) {
 		$recording_model = new RecordingModel();
 		$record_exists = !empty($recording_model->find_one($request["file_name"])->fetch());
-		$response = false;
+		$status_code = 400;
+		$response_message = [];
 
 		if (!$record_exists) {
 			$recording = $recording_model->insert($request);
-
-			if ($recording->rowCount() === 1) {
-				$response = true;
-			}
+			$is_recording_stored = $recording->rowCount() === 1;
+			$status_code = $is_recording_stored ? 201 : 500;
+			$response_message[] = $is_recording_stored ? "File succesfully stored." : "Internal server error.";
+		}
+		else {
+			$response_message[] = "File already exists.";
 		}
 
 		return [
-				"recording" => $response,
+				"status_code"      => $status_code,
+				"response_message" => $response_message,
 		];
 	}
 }
