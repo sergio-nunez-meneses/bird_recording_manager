@@ -66,8 +66,8 @@ async function postBirdRecording(e) {
 	}
 	else {
 		const icon     = audio.previousElementSibling;
-		icon.className = "stored-icon";
-		icon.src       = "/assets/img/icons/star.svg";
+		icon.className = "download-icon";
+		icon.src       = "/assets/img/icons/download.svg";
 
 		if (icon.classList.contains("hidden")) {
 			icon.classList.remove("hidden")
@@ -107,8 +107,8 @@ async function getStoredRecordings(birdName) {
 }
 
 function setFileIcon(recordings, fileName) {
-	if (recordings.find(recording => recording["file_name"] === fileName) !== undefined) {
-		return 'class="stored-icon" src="/assets/img/icons/star.svg"';
+	if (recordings.find(recording => recording["file_name"] === fileName) === undefined) {
+		return 'class="download-icon" src="/assets/img/icons/download.svg"';
 	}
 	return 'class="hidden"';
 }
