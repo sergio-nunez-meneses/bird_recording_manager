@@ -35,14 +35,14 @@ async function displayBirdRecordings(e) {
 				recording => document.querySelector(".bird-recordings").appendChild(recording),
 		);
 
-		Array.from(document.querySelectorAll(".download-link")).map(async(link) => {
-			link.addEventListener("click", async(e) => {
+		Array.from(document.querySelectorAll(".download-icon")).map(async(downloadIcon) => {
+			downloadIcon.addEventListener("click", async(e) => {
 				await postBirdRecording(e);
 			})
 		})
 
 		// Automatic test
-		document.querySelector(".download-link").dispatchEvent(new Event("click"));
+		document.querySelector(".download-icon").dispatchEvent(new Event("click"));
 	}
 }
 
@@ -51,9 +51,11 @@ async function postBirdRecording(e) {
 
 	clearErrorContainer();
 
-	const audio    = e.target.previousElementSibling.lastElementChild;
-	const fileName = audio.src.split("/").pop();
-	const data     = new FormData();
+	const icon        = e.target;
+	const downloadUrl = icon.nextElementSibling.value;
+	const audio       = icon.parentElement.lastElementChild;
+	const fileName    = audio.src.split("/").pop();
+	const data        = new FormData();
 
 	data.append("action", "store_recording");
 	data.append("bird_name", enteredBirdName.value);
@@ -65,12 +67,12 @@ async function postBirdRecording(e) {
 		displayErrors(response["response_message"]);
 	}
 	else {
-		const icon     = audio.previousElementSibling;
-		icon.className = "download-icon";
-		icon.src       = "/assets/img/icons/download.svg";
+		downloadRecording(downloadUrl);
 
-		if (icon.classList.contains("hidden")) {
-			icon.classList.remove("hidden")
+		icon.className = icon.src = "";
+
+		if (!icon.classList.contains("hidden")) {
+			icon.classList.add("hidden")
 		}
 	}
 }
@@ -121,6 +123,14 @@ function toTitleCase(str) {
 
 function strToDom(str) {
 	return new DOMParser().parseFromString(str, "text/html").body;
+}
+
+function downloadRecording(url) {
+	const link = document.createElement("a");
+	link.href  = url;
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
 }
 
 function displayErrors(errorMessages) {
