@@ -1,7 +1,8 @@
 <div class="recording">
   <div class="player-container">
+    <!-- TODO: If not download-class then no input download-url -->
     <img {{ fileIcon }} />
+    <input type="hidden" name="download-url" value="{{ downloadUrl }}">
     <audio src="{{ fileUrl }}" controls=""></audio>
   </div>
-  <a href="{{ downloadUrl }}" class="download-link" download>Download file</a>
 </div>
