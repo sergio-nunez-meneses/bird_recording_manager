@@ -19,7 +19,6 @@
 </head>
 <body>
 <div class="main-container">
-	<!-- TODO: Handle errors -->
 	<div class="error-container hidden"></div>
 	<div class="search-container">
 		<input type="text" name="bird-name" value="dendrocopos major" placeholder="Type a bird's generic name">
