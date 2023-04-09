@@ -82,16 +82,18 @@ async function getBirdRecordings(birdName) {
 	const bird          = {};
 
 	if (parseInt(apiRecordings["numRecordings"]) > 0) {
-		const stored       = await getStoredRecordings(birdName);
-		bird["recordings"] = [];
+		let storedRecordings = await getStoredRecordings(birdName);
+		bird["recordings"]   = [];
 
 		for (const recording of apiRecordings["recordings"]) {
 			const fileName = encodeURIComponent(recording["file-name"]);
 			const fileUrl  = recording["sono"]["small"].split("ffts")[0] + fileName;
-			let fileUrls   = {
+			const fileUrls = {
 				"fileUrl"    : `https:${fileUrl}`,
-				"downloadUrl": recording["file"],
-				"fileIcon"   : setFileIcon(stored["recordings"], fileName),
+				"downloadUrl": !isRecordingStored(storedRecordings["recordings"], fileName) ?
+						`<input type="hidden" name="download-url" value="${recording["file"]}">` : "",
+				"fileIcon"   : !isRecordingStored(storedRecordings["recordings"], fileName) ?
+						'class="download-icon" src="/assets/img/icons/download.svg"' : 'class="hidden"',
 			};
 
 			bird["recordings"].push(fileUrls);
@@ -108,11 +110,8 @@ async function getStoredRecordings(birdName) {
 	return await ajax("post", "/ajax", data);
 }
 
-function setFileIcon(recordings, fileName) {
-	if (recordings.find(recording => recording["file_name"] === fileName) === undefined) {
-		return 'class="download-icon" src="/assets/img/icons/download.svg"';
-	}
-	return 'class="hidden"';
+function isRecordingStored(recordings, fileName) {
+	return recordings.find(recording => recording["file_name"] === fileName) !== undefined;
 }
 
 function toTitleCase(str) {
