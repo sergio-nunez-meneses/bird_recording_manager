@@ -15,8 +15,12 @@ body {
 	color: #fff;
 }
 
-.main-container, .bird-container, .bird-info, .bird-recordings, .recording {
+.error-container, .main-container, .bird-container, .bird-info, .bird-recordings, .recording {
 	display: flex;
+}
+
+.error-container ul li {
+	list-style: none;
 }
 
 .bird-container, .bird-info {
@@ -42,7 +46,7 @@ body {
 	align-items: center;
 }
 
-.bird-recordings {
+.error-container, .bird-recordings {
 	justify-content: center;
 }
 
