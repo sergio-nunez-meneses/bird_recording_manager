@@ -6,8 +6,7 @@ import {ajax, hydrateTemplate} from './functions.js';
 // ============================================================================
 //  Variables
 // ============================================================================
-const enteredBirdName = document.querySelector('[name="bird-name"]');
-const errorContainer  = document.querySelector(".error-container");
+let queryPage = document.querySelector('[name="query-page"]');
 
 // ============================================================================
 //  Functions
@@ -17,8 +16,9 @@ async function displayBirdRecordings(e) {
 
 	clearErrorContainer();
 
-	const birdName       = enteredBirdName.value;
-	const birdRecordings = await getBirdRecordings(birdName);
+	const birdName       = document.querySelector('[name="bird-name"]').value;
+	const currentPage    = parseInt(queryPage.value);
+	const birdRecordings = await getBirdRecordings(birdName, currentPage);
 
 	if (Object.keys(birdRecordings).length > 0) {
 		const birdTemplate              = await ajax("get", "../templates/bird.html")
@@ -26,6 +26,7 @@ async function displayBirdRecordings(e) {
 		const hydratedBirdTemplate      = hydrateTemplate(birdTemplate, {"birdGenName": toTitleCase(birdName)});
 		const hydratedRecordingTemplate = hydrateTemplate(recordingTemplate, birdRecordings["recordings"]);
 
+		// TODO: Function appendTemplatesToDom
 		if (document.querySelector(".bird-container")) {
 			document.querySelector(".bird-container").remove();
 		}
@@ -35,6 +36,27 @@ async function displayBirdRecordings(e) {
 				recording => document.querySelector(".bird-recordings").appendChild(recording),
 		);
 
+		if (parseInt(birdRecordings["pages"]) > 1) {
+			// TODO: Function appendPaginationToDom
+			clearPaginationContainer();
+
+			const paginationTemplate = createPagination(currentPage, parseInt(birdRecordings["pages"]));
+			Array.from(strToDom(paginationTemplate).children).forEach(
+					page => document.querySelector(".pagination-container").appendChild(page),
+			);
+
+			if (document.querySelector(".pagination-container").classList.contains("hidden")) {
+				document.querySelector(".pagination-container").classList.remove("hidden");
+			}
+
+			document.querySelectorAll('[name="pagination-button"]').forEach(button => {
+				button.addEventListener("click", async (e) => {
+					queryPage.value = e.target.value;
+					await displayBirdRecordings(e);
+				})
+			});
+		}
+
 		Array.from(document.querySelectorAll(".download-icon")).map(async(downloadIcon) => {
 			downloadIcon.addEventListener("click", async(e) => {
 				await postBirdRecording(e);
@@ -42,7 +64,7 @@ async function displayBirdRecordings(e) {
 		})
 
 		// Automatic test
-		document.querySelector(".download-icon").dispatchEvent(new Event("click"));
+		// document.querySelector(".download-icon").dispatchEvent(new Event("click"));
 	}
 }
 
@@ -51,6 +73,7 @@ async function postBirdRecording(e) {
 
 	clearErrorContainer();
 
+	const birdName    = document.querySelector('[name="bird-name"]').value;
 	const icon        = e.target;
 	const downloadUrl = icon.nextElementSibling.value;
 	const audio       = icon.parentElement.lastElementChild;
@@ -58,7 +81,7 @@ async function postBirdRecording(e) {
 	const data        = new FormData();
 
 	data.append("action", "store_recording");
-	data.append("bird_name", enteredBirdName.value);
+	data.append("bird_name", birdName);
 	data.append("file_name", fileName);
 
 	const response = await ajax("post", "/ajax", data);
@@ -69,6 +92,7 @@ async function postBirdRecording(e) {
 	else {
 		downloadRecording(downloadUrl);
 
+		// TODO: Function clearIcon
 		icon.className = icon.src = "";
 
 		if (!icon.classList.contains("hidden")) {
@@ -77,12 +101,13 @@ async function postBirdRecording(e) {
 	}
 }
 
-async function getBirdRecordings(birdName) {
-	const apiRecordings = await ajax("get", `https://xeno-canto.org/api/2/recordings?query=${birdName}+cnt:france`);
+async function getBirdRecordings(birdName, queryPage) {
+	const apiRecordings = await ajax("get", `https://xeno-canto.org/api/2/recordings?query=${birdName}+cnt:france&page=${queryPage}`);
 	const bird          = {};
 
 	if (parseInt(apiRecordings["numRecordings"]) > 0) {
 		let storedRecordings = await getStoredRecordings(birdName);
+		bird["pages"]        = apiRecordings["numPages"];
 		bird["recordings"]   = [];
 
 		for (const recording of apiRecordings["recordings"]) {
@@ -124,6 +149,21 @@ function strToDom(str) {
 	return new DOMParser().parseFromString(str, "text/html").body;
 }
 
+function createPagination(currentPage, totalPages) {
+	let pagination = "";
+
+	for (let i = 1; i <= totalPages; i++) {
+		if (i !== currentPage) {
+			pagination += `<input type="button" name="pagination-button" value="${i}">`;
+		}
+		else {
+			pagination += `<span class="page">${i}</span>`;
+		}
+	}
+
+	return pagination;
+}
+
 function downloadRecording(url) {
 	const link = document.createElement("a");
 	link.href  = url;
@@ -133,7 +173,9 @@ function downloadRecording(url) {
 }
 
 function displayErrors(errorMessages) {
-	const list = document.createElement("ul");
+	const errorContainer = document.querySelector(".error-container");
+	const list           = document.createElement("ul");
+
 	for (const errorMessage of errorMessages) {
 		const item     = document.createElement("li");
 		item.innerText = errorMessage;
@@ -147,8 +189,13 @@ function displayErrors(errorMessages) {
 }
 
 function clearErrorContainer() {
-	errorContainer.className = "hidden";
-	errorContainer.innerHTML = "";
+	document.querySelector(".error-container").classList.add("hidden");
+	document.querySelector(".error-container").innerHTML = "";
+}
+
+function clearPaginationContainer() {
+	document.querySelector(".pagination-container").classList.add("hidden");
+	document.querySelector(".pagination-container").innerHTML = "";
 }
 
 // ============================================================================
@@ -163,6 +210,6 @@ document.querySelector('[name="search-button"]').addEventListener("click", async
 });
 
 // Automatic test
-document.addEventListener("DOMContentLoaded", () => {
-	document.querySelector('[name="search-button"]').dispatchEvent(new Event("click"));
-});
+// document.addEventListener("DOMContentLoaded", async () => {
+// 	document.querySelector('[name="search-button"]').dispatchEvent(new Event("click"));
+// });
