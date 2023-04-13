@@ -21,13 +21,15 @@
 <div class="error-container hidden"></div>
 <div class="main-container">
 	<div class="search-container">
-		<input type="text" name="bird-name" value="dendrocopos major" placeholder="Type a bird's generic name">
+		<input type="text" name="bird-name" value="erithacus rubecula" placeholder="Type a bird's generic name">
+		<input type="hidden" name="query-page" value="1">
 		<input type="button" name="search-button" value="Search">
 	</div>
 	<?php if (!empty($content)) : ?>
 		<?php echo $content; ?>
 	<?php endif; ?>
 </div>
+<div class="pagination-container hidden"></div>
 <?php if (!empty($scripts)) : ?>
 	<?php foreach ($scripts as $script_path) : ?>
 		<script src="<?php echo $script_path; ?>.js"></script>
