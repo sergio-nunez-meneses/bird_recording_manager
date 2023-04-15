@@ -21,47 +21,17 @@ async function displayBirdRecordings(e) {
 	const birdRecordings = await getBirdRecordings(birdName, currentPage);
 
 	if (Object.keys(birdRecordings).length > 0) {
+		const totalPages                = parseInt(birdRecordings["pages"]);
 		const birdTemplate              = await ajax("get", "../templates/bird.html")
 		const recordingTemplate         = await ajax("get", "../templates/recording.html")
 		const hydratedBirdTemplate      = hydrateTemplate(birdTemplate, {"birdGenName": toTitleCase(birdName)});
 		const hydratedRecordingTemplate = hydrateTemplate(recordingTemplate, birdRecordings["recordings"]);
 
-		// TODO: Function appendTemplatesToDom
-		if (document.querySelector(".bird-container")) {
-			document.querySelector(".bird-container").remove();
+		appendRecordingsToDom(hydratedBirdTemplate, hydratedRecordingTemplate);
+
+		if (totalPages > 1) {
+			appendPaginationToDom(currentPage, totalPages);
 		}
-
-		document.querySelector(".main-container").appendChild(strToDom(hydratedBirdTemplate).firstElementChild);
-		Array.from(strToDom(hydratedRecordingTemplate).children).forEach(
-				recording => document.querySelector(".bird-recordings").appendChild(recording),
-		);
-
-		if (parseInt(birdRecordings["pages"]) > 1) {
-			// TODO: Function appendPaginationToDom
-			clearPaginationContainer();
-
-			const paginationTemplate = createPagination(currentPage, parseInt(birdRecordings["pages"]));
-			Array.from(strToDom(paginationTemplate).children).forEach(
-					page => document.querySelector(".pagination-container").appendChild(page),
-			);
-
-			if (document.querySelector(".pagination-container").classList.contains("hidden")) {
-				document.querySelector(".pagination-container").classList.remove("hidden");
-			}
-
-			document.querySelectorAll('[name="pagination-button"]').forEach(button => {
-				button.addEventListener("click", async (e) => {
-					queryPage.value = e.target.value;
-					await displayBirdRecordings(e);
-				})
-			});
-		}
-
-		Array.from(document.querySelectorAll(".download-icon")).map(async(downloadIcon) => {
-			downloadIcon.addEventListener("click", async(e) => {
-				await postBirdRecording(e);
-			})
-		})
 
 		// Automatic test
 		// document.querySelector(".download-icon").dispatchEvent(new Event("click"));
@@ -91,14 +61,50 @@ async function postBirdRecording(e) {
 	}
 	else {
 		downloadRecording(downloadUrl);
-
-		// TODO: Function clearIcon
-		icon.className = icon.src = "";
-
-		if (!icon.classList.contains("hidden")) {
-			icon.classList.add("hidden")
-		}
+		removeDownloadIcon(icon);
 	}
+}
+
+function appendRecordingsToDom(birdTemplate, recordingTemplate) {
+	if (document.querySelector(".bird-container")) {
+		document.querySelector(".bird-container").remove();
+	}
+
+	document.querySelector(".main-container").appendChild(strToDom(birdTemplate).firstElementChild);
+	appendTemplateToDom(recordingTemplate, ".bird-recordings");
+
+	document.querySelectorAll(".download-icon").forEach(downloadIcon => {
+		downloadIcon.addEventListener("click", async(e) => {
+			await postBirdRecording(e);
+		})
+	})
+}
+
+function appendPaginationToDom(currentPage, totalPages) {
+	clearPaginationContainer();
+
+	const paginationTemplate = createPagination(currentPage, totalPages);
+	const paginationSelector = ".pagination-container";
+
+	appendTemplateToDom(paginationTemplate, paginationSelector);
+
+	if (document.querySelector(paginationSelector).classList.contains("hidden")) {
+		document.querySelector(paginationSelector).classList.remove("hidden");
+	}
+
+	document.querySelectorAll('[name="pagination-button"]').forEach(button => {
+		button.addEventListener("click", async(e) => {
+			queryPage.value = e.target.value;
+
+			await displayBirdRecordings(e);
+		})
+	});
+}
+
+function appendTemplateToDom(template, selector) {
+	Array.from(strToDom(template).children).forEach(
+			element => document.querySelector(selector).appendChild(element),
+	);
 }
 
 async function getBirdRecordings(birdName, queryPage) {
@@ -196,6 +202,14 @@ function clearErrorContainer() {
 function clearPaginationContainer() {
 	document.querySelector(".pagination-container").classList.add("hidden");
 	document.querySelector(".pagination-container").innerHTML = "";
+}
+
+function removeDownloadIcon(icon) {
+	icon.className = icon.src = "";
+
+	if (!icon.classList.contains("hidden")) {
+		icon.classList.add("hidden")
+	}
 }
 
 // ============================================================================
